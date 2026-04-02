@@ -475,13 +475,15 @@ async function loadFromSheets(){
   btn.disabled=true; btn.textContent='Carregando...';
   document.getElementById('setup-loading').style.display='block';
   document.getElementById('setup-error').style.display='none';
-  // Google Sheets CSV export URL (planilha pública)
-  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
+
+  // Usa o endpoint JSON do Google Sheets — lida corretamente com
+  // vírgulas, &, acentos e qualquer caractere especial nos valores
+  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
   try{
     const resp=await fetch(url);
     if(!resp.ok) throw new Error('Planilha não encontrada ou não pública.');
     const text=await resp.text();
-    parseSheetCSV(text);
+    parseSheetJSON(text);
     populateForm();
     document.getElementById('sheets-badge').style.display='inline-block';
     document.getElementById('sheets-info').style.display='block';
@@ -493,19 +495,24 @@ async function loadFromSheets(){
   document.getElementById('setup-loading').style.display='none';
 }
 
-function parseSheetCSV(text){
+function parseSheetJSON(raw){
   sheetData={};
-  const lines=text.split('\n');
-  lines.forEach(line=>{
-    if(!line.trim()) return;
-    // parse CSV line: "KEY","VALUE","INSTRUCTIONS"
-    const cols=line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-    if(cols.length>=2){
-      const key=cols[0].replace(/^"|"$/g,'').trim();
-      const val=cols[1].replace(/^"|"$/g,'').trim();
+  // Google retorna JSONP: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+  // Precisamos extrair só o JSON interno
+  const jsonStr=raw.replace(/^[^{]*/, '').replace(/\);?\s*$/, '');
+  try{
+    const json=JSON.parse(jsonStr);
+    const rows=json.table.rows;
+    rows.forEach(row=>{
+      if(!row.c || row.c.length<2) return;
+      const key  = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : '';
+      const val  = row.c[1] && row.c[1].v != null ? String(row.c[1].v).trim() : '';
       if(key) sheetData[key]=val;
-    }
-  });
+    });
+  }catch(e){
+    // fallback: tenta parsear mesmo assim
+    console.warn('Erro ao parsear JSON do Sheets:', e);
+  }
 }
 
 function g(key,fallback=''){return sheetData[key]!==undefined?sheetData[key]:fallback;}
