@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Mensal – Evolutto</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:#cc2031;--white:#ffffff;--beige:#dfccb5;--terra:#a46d57;
+  --bg:#faf8f5;--card:#ffffff;--dark:#1e0f0a;
+  --muted:#9a7a70;--border:#ede5da;--light:#f5ede3;
+  --green-bg:#f0fdf4;--red-bg:#fff1f2;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--dark);}
+.screen{display:none;}.screen.active{display:block;}
+
+/* ── SETUP SCREEN ── */
+#setup-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+.setup-box{
+  background:var(--card);border-radius:20px;padding:48px;
+  border:1px solid var(--border);max-width:560px;width:90%;
+  box-shadow:0 8px 40px rgba(30,15,10,.08);text-align:center;
+}
+.setup-logo{font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:32px;}
+.setup-logo span{color:var(--muted);font-weight:300;}
+.setup-title{font-size:22px;font-weight:800;color:var(--dark);margin-bottom:8px;letter-spacing:-.3px;}
+.setup-sub{font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.6;font-weight:400;}
+.setup-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--terra);font-weight:700;display:block;margin-bottom:8px;text-align:left;}
+.setup-input{
+  width:100%;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:12px;padding:12px 16px;color:var(--dark);
+  font-family:'Montserrat',sans-serif;font-size:12px;font-weight:500;
+  outline:none;transition:all .2s;margin-bottom:24px;
+}
+.setup-input:focus{border-color:var(--red);background:#fff;}
+.btn-load{
+  background:var(--red);color:#fff;border:none;width:100%;
+  padding:14px;border-radius:50px;font-family:'Montserrat',sans-serif;
+  font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+}
+.btn-load:hover{background:#a81828;}
+.btn-load:disabled{background:var(--muted);cursor:not-allowed;}
+.setup-hint{font-size:11px;color:var(--muted);margin-top:20px;line-height:1.6;}
+.setup-hint a{color:var(--terra);text-decoration:none;}
+.setup-hint a:hover{text-decoration:underline;}
+.setup-error{
+  background:var(--red-bg);color:#dc2626;border-radius:10px;
+  padding:12px 16px;font-size:12px;font-weight:500;margin-top:16px;display:none;
+}
+.setup-loading{
+  color:var(--muted);font-size:12px;margin-top:16px;display:none;
+}
+.setup-divider{border:none;border-top:1px solid var(--border);margin:28px 0;}
+.btn-manual{
+  background:none;color:var(--terra);border:1.5px solid var(--beige);
+  width:100%;padding:12px;border-radius:50px;font-family:'Montserrat',sans-serif;
+  font-weight:600;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+}
+.btn-manual:hover{border-color:var(--terra);}
+
+/* ── EDIT ── */
+#edit-screen{background:var(--bg);min-height:100vh;}
+.edit-header{background:var(--red);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.edit-brand{font-size:15px;font-weight:800;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+.edit-brand span{color:var(--beige);font-weight:300;}
+.edit-header-btns{display:flex;gap:10px;align-items:center;}
+.btn-sheets{
+  background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);
+  padding:8px 18px;border-radius:50px;font-family:'Montserrat',sans-serif;
+  font-weight:600;font-size:10px;letter-spacing:1.5px;cursor:pointer;
+  text-transform:uppercase;transition:all .2s;
+}
+.btn-sheets:hover{background:rgba(255,255,255,.25);}
+.btn-preview{
+  background:#fff;color:var(--red);border:none;padding:9px 24px;border-radius:50px;
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;
+  letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;transition:all .2s;
+}
+.btn-preview:hover{background:var(--beige);}
+.sheets-badge{
+  background:rgba(255,255,255,.15);border-radius:8px;padding:4px 12px;
+  font-size:10px;color:rgba(255,255,255,.8);font-weight:500;
+}
+.edit-body{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 61px);}
+.edit-nav{background:var(--white);border-right:1px solid var(--border);padding:24px 0;}
+.edit-nav-section{padding:18px 20px 6px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--terra);font-weight:700;}
+.edit-nav-item{padding:11px 20px;font-size:11px;color:var(--muted);cursor:pointer;border-left:3px solid transparent;transition:all .2s;font-weight:500;}
+.edit-nav-item:hover,.edit-nav-item.active{background:var(--light);border-left-color:var(--red);color:var(--dark);font-weight:600;}
+.edit-content{padding:36px;overflow-y:auto;max-height:calc(100vh - 61px);}
+.edit-section{display:none;}.edit-section.active{display:block;}
+.section-title{font-size:20px;font-weight:800;color:var(--dark);margin-bottom:4px;}
+.section-sub{font-size:12px;color:var(--muted);margin-bottom:28px;font-weight:400;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.form-grid-3{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.form-group input,.form-group select,.form-group textarea{
+  background:var(--bg);border:1.5px solid var(--border);border-radius:12px;
+  padding:9px 14px;color:var(--dark);font-family:'Montserrat',sans-serif;
+  font-size:12px;font-weight:500;outline:none;transition:all .2s;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--red);background:#fff;}
+.form-group textarea{resize:vertical;min-height:90px;}
+.form-divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
+.form-subtitle{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--terra);font-weight:700;margin-bottom:16px;}
+.logo-upload-area{border:2px dashed var(--beige);border-radius:16px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);margin-bottom:20px;}
+.logo-upload-area:hover{border-color:var(--terra);background:var(--light);}
+.logo-upload-area p{font-size:11px;color:var(--muted);margin-top:8px;font-weight:500;}
+#logo-client-input{display:none;}
+.inf-block{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;position:relative;}
+.inf-block .rm{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;}
+.btn-add{background:none;border:1.5px dashed var(--beige);color:var(--terra);padding:10px 20px;border-radius:50px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;transition:all .2s;}
+.btn-add:hover{border-color:var(--terra);color:var(--dark);}
+.month-row{display:grid;grid-template-columns:130px 1fr 40px;gap:10px;align-items:center;margin-bottom:10px;}
+.sheets-info{background:var(--light);border-radius:12px;padding:16px;margin-bottom:24px;font-size:11px;color:var(--terra);font-weight:500;border:1px solid var(--beige);}
+.sheets-info strong{font-weight:700;color:var(--dark);}
+
+/* ── TOOLBAR ── */
+.report-toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 36px;display:flex;align-items:center;justify-content:space-between;}
+.report-toolbar span{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:600;}
+.toolbar-btns{display:flex;gap:10px;}
+.btn-back{background:none;border:1.5px solid var(--border);color:var(--dark);padding:8px 20px;border-radius:50px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;transition:all .2s;}
+.btn-back:hover{border-color:var(--terra);}
+.btn-pdf{background:var(--red);border:none;color:#fff;padding:8px 20px;border-radius:50px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;transition:all .2s;}
+.btn-pdf:hover{background:#a81828;}
+
+/* ── REPORT ── */
+#report-screen{background:var(--bg);min-height:100vh;}
+.report-page{max-width:920px;margin:0 auto;padding:32px 24px 60px;}
+.r-header{display:grid;grid-template-columns:1fr auto;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(30,15,10,.08);margin-bottom:28px;break-inside:avoid;page-break-inside:avoid;}
+.r-header-left{background:var(--red);padding:28px 32px;position:relative;overflow:hidden;}
+.r-header-right{background:var(--white);padding:28px 32px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-width:220px;position:relative;overflow:hidden;}
+.r-agency{font-size:20px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;position:relative;z-index:1;}
+.r-agency-tag{font-size:9px;color:rgba(255,255,255,.65);letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-weight:400;position:relative;z-index:1;}
+.r-client-logo{max-height:46px;max-width:150px;object-fit:contain;position:relative;z-index:1;}
+.r-client-name-text{font-size:17px;font-weight:800;color:var(--dark);text-align:right;letter-spacing:-.3px;position:relative;z-index:1;}
+.r-period{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px;font-weight:500;position:relative;z-index:1;}
+.r-section{margin-bottom:28px;break-inside:avoid;page-break-inside:avoid;}
+.r-section-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--terra);font-weight:700;margin-bottom:3px;}
+.r-section-heading{font-size:17px;color:var(--dark);font-weight:800;margin-bottom:16px;letter-spacing:-.3px;break-after:avoid;page-break-after:avoid;}
+.cards-grid{display:grid;gap:12px;}
+.cards-4{grid-template-columns:1fr 1fr 1fr 1fr;}
+.r-card{background:var(--card);border-radius:16px;padding:18px;border:1px solid var(--border);box-shadow:0 2px 10px rgba(30,15,10,.04);break-inside:avoid;page-break-inside:avoid;}
+.r-card-top{width:28px;height:3px;border-radius:20px;background:var(--red);margin-bottom:12px;}
+.r-card-top.terra{background:var(--terra);}
+.r-card-top.beige{background:var(--beige);}
+.r-card-icon{font-size:16px;margin-bottom:6px;display:block;}
+.r-card-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px;}
+.r-card-value{font-size:22px;font-weight:900;color:var(--dark);line-height:1;margin-bottom:7px;letter-spacing:-.5px;}
+.r-delta{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:6px;letter-spacing:.5px;}
+.up{background:var(--green-bg);color:#16a34a;}
+.down{background:var(--red-bg);color:#dc2626;}
+.neutral{background:var(--light);color:var(--terra);}
+.r-card-explain{font-size:10px;color:var(--muted);line-height:1.55;font-weight:400;}
+.channel-card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:20px;margin-bottom:12px;box-shadow:0 2px 10px rgba(30,15,10,.04);break-inside:avoid;page-break-inside:avoid;}
+.channel-title-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.ch-dot{width:9px;height:9px;border-radius:50%;}
+.ch-google{background:#4285F4;}.ch-meta{background:#0668E1;}.ch-ig{background:#C13584;}.ch-fb{background:#1877F2;}
+.channel-title{font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--dark);}
+.ch-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.ch-row:last-child{border-bottom:none;padding-bottom:0;}
+.ch-label{font-size:11px;color:var(--muted);font-weight:400;}
+.ch-right{display:flex;align-items:center;gap:8px;}
+.ch-val{font-size:14px;font-weight:800;color:var(--dark);}
+.format-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.format-pill{background:var(--bg);border-radius:12px;padding:12px;text-align:center;border:1px solid var(--border);}
+.fp-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:3px;}
+.fp-val{font-size:16px;font-weight:900;color:var(--dark);}
+.fp-sub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:400;}
+.follower-chart-wrap{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:20px;margin-top:12px;box-shadow:0 2px 10px rgba(30,15,10,.04);break-inside:avoid;page-break-inside:avoid;}
+.follower-chart-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--terra);font-weight:700;margin-bottom:14px;}
+.inf-table-wrap{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 10px rgba(30,15,10,.04);break-inside:avoid;page-break-inside:avoid;}
+.inf-table{width:100%;border-collapse:collapse;font-size:11px;}
+.inf-table thead th{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);}
+.inf-table tbody tr{border-bottom:1px solid var(--border);}
+.inf-table tbody tr:last-child{border-bottom:none;}
+.inf-table td{padding:11px 14px;color:var(--dark);}
+.inf-name{font-weight:700;}
+.inf-handle-link{color:var(--red);text-decoration:none;font-weight:600;}
+.inf-handle-link:hover{text-decoration:underline;}
+.inf-plat-tag{font-size:10px;color:var(--muted);}
+.exec-box{background:var(--red);border-radius:20px;padding:28px 32px;position:relative;overflow:hidden;break-inside:avoid;page-break-inside:avoid;}
+.exec-quote{position:absolute;right:26px;top:-6px;font-size:80px;color:rgba(255,255,255,.07);font-weight:900;pointer-events:none;}
+.exec-box p{font-size:13px;line-height:1.85;color:#fff;font-weight:300;position:relative;z-index:1;}
+.exec-box p strong{font-weight:700;color:var(--beige);}
+.r-footer{background:var(--dark);border-radius:16px;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;margin-top:28px;break-inside:avoid;page-break-inside:avoid;}
+.r-footer-brand{font-size:12px;font-weight:800;color:var(--beige);letter-spacing:3px;text-transform:uppercase;}
+.r-footer-note{font-size:9px;color:var(--muted);letter-spacing:1px;font-weight:400;}
+
+@media print{
+  .report-toolbar{display:none!important;}
+  html,body{background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .report-page{max-width:100%!important;padding:8mm 10mm!important;margin:0!important;}
+  .r-header,.r-card,.channel-card,.follower-chart-wrap,.inf-table-wrap,.exec-box,.r-footer,.r-section,.cards-grid{break-inside:avoid!important;page-break-inside:avoid!important;}
+  .r-section-heading,.r-section-label{break-after:avoid!important;page-break-after:avoid!important;}
+  .cards-4{grid-template-columns:1fr 1fr!important;}
+  .r-section{margin-bottom:16px!important;}
+  .channel-card{margin-bottom:8px!important;}
+  .exec-box{background:#cc2031!important;}
+  .r-header-left{background:#cc2031!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ══ -->
+<div id="setup-screen" class="screen active">
+  <div class="setup-box">
+    <div class="setup-logo">EVOLUTTO <span>/ relatório mensal</span></div>
+    <div class="setup-title">Conectar à Planilha</div>
+    <div class="setup-sub">Cole abaixo o ID da sua planilha Google Sheets. Os dados serão carregados automaticamente e cada pessoa da equipe verá sempre a versão mais atualizada.</div>
+    <label class="setup-label">ID da Planilha Google Sheets</label>
+    <input class="setup-input" id="sheets-id" type="text" placeholder="Ex: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+    <button class="btn-load" onclick="loadFromSheets()">☁ Carregar Dados da Planilha</button>
+    <div class="setup-error" id="setup-error"></div>
+    <div class="setup-loading" id="setup-loading">⏳ Carregando dados da planilha...</div>
+    <div class="setup-hint">
+      <strong>Como encontrar o ID:</strong> Abra sua planilha e copie o trecho entre <code>/d/</code> e <code>/edit</code> da URL.<br><br>
+      <strong>Exemplo de URL:</strong><br>
+      <code>sheets.google.com/spreadsheets/d/<strong>1BxiMVs0XRA5...</strong>/edit</code><br><br>
+      A planilha precisa estar compartilhada como <strong>"Qualquer pessoa com o link pode ver"</strong>.
+    </div>
+    <hr class="setup-divider">
+    <button class="btn-manual" onclick="skipToManual()">✏️ Preencher manualmente (sem planilha)</button>
+  </div>
+</div>
+
+<!-- ══ EDIT SCREEN ══ -->
+<div id="edit-screen" class="screen">
+  <div class="edit-header">
+    <div class="edit-brand">EVOLUTTO <span>/ painel de relatório</span></div>
+    <div class="edit-header-btns">
+      <span class="sheets-badge" id="sheets-badge" style="display:none;">📊 Conectado ao Sheets</span>
+      <button class="btn-sheets" onclick="goToSetup()" title="Recarregar dados da planilha">↺ Recarregar Planilha</button>
+      <button class="btn-preview" onclick="generateReport()">▶ Visualizar Relatório</button>
+    </div>
+  </div>
+  <div class="edit-body">
+    <nav class="edit-nav">
+      <div class="edit-nav-section">Geral</div>
+      <div class="edit-nav-item active" onclick="showSec('s-geral',this)">Cabeçalho</div>
+      <div class="edit-nav-section">Mídia Paga</div>
+      <div class="edit-nav-item" onclick="showSec('s-google',this)">Google Display</div>
+      <div class="edit-nav-item" onclick="showSec('s-meta',this)">Meta Ads</div>
+      <div class="edit-nav-section">Orgânico</div>
+      <div class="edit-nav-item" onclick="showSec('s-instagram',this)">Instagram</div>
+      <div class="edit-nav-item" onclick="showSec('s-facebook',this)">Facebook</div>
+      <div class="edit-nav-section">Influência</div>
+      <div class="edit-nav-item" onclick="showSec('s-inf',this)">Influenciadores</div>
+      <div class="edit-nav-section">Resumo</div>
+      <div class="edit-nav-item" onclick="showSec('s-resumo',this)">Resumo Executivo</div>
+    </nav>
+    <div class="edit-content">
+
+      <div id="s-geral" class="edit-section active">
+        <div class="section-title">Cabeçalho</div>
+        <div class="section-sub">Informações gerais do relatório.</div>
+        <div class="sheets-info" id="sheets-info" style="display:none;">
+          📊 <strong>Dados carregados da planilha.</strong> Edições aqui são só para visualização — para salvar permanentemente, atualize a planilha Google Sheets.
+        </div>
+        <div class="form-subtitle">Logo do Cliente</div>
+        <div class="logo-upload-area" onclick="document.getElementById('logo-client-input').click()">
+          <img id="client-logo-preview" src="" style="display:none;max-height:56px;max-width:180px;object-fit:contain;">
+          <p id="client-logo-placeholder">☕ Clique para fazer upload da logo do cliente<br><small style="opacity:.6">PNG, SVG ou JPG</small></p>
+        </div>
+        <input type="file" id="logo-client-input" accept="image/*" onchange="handleLogoUpload(this)">
+        <div class="form-grid">
+          <div class="form-group"><label>Nome do Cliente (backup sem logo)</label><input id="f-cliente" type="text" value="Café Evolutto"></div>
+          <div class="form-group"><label>Período</label><input id="f-periodo" type="text" value="Março 2025"></div>
+          <div class="form-group"><label>Nome da Agência</label><input id="f-agencia" type="text" value="EVOLUTTO"></div>
+          <div class="form-group"><label>Tagline</label><input id="f-tag" type="text" value="Estratégia & Performance Digital"></div>
+        </div>
+      </div>
+
+      <div id="s-google" class="edit-section">
+        <div class="section-title">Google Display</div>
+        <div class="section-sub">Mês atual vs mês anterior.</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Investimento (R$)</label><input id="g-invest" type="text" value="5200"></div>
+          <div class="form-group"><label>Invest. Ant.</label><input id="g-invest-p" type="text" value="4800"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Impressões</label><input id="g-impr" type="text" value="320000"></div>
+          <div class="form-group"><label>Impressões Ant.</label><input id="g-impr-p" type="text" value="290000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Cliques</label><input id="g-clicks" type="text" value="4800"></div>
+          <div class="form-group"><label>Cliques Ant.</label><input id="g-clicks-p" type="text" value="4200"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Alcance</label><input id="g-alcance" type="text" value="180000"></div>
+          <div class="form-group"><label>Alcance Ant.</label><input id="g-alcance-p" type="text" value="160000"></div>
+        </div>
+      </div>
+
+      <div id="s-meta" class="edit-section">
+        <div class="section-title">Meta Ads</div>
+        <div class="section-sub">Feed + Stories.</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Investimento (R$)</label><input id="m-invest" type="text" value="7400"></div>
+          <div class="form-group"><label>Invest. Ant.</label><input id="m-invest-p" type="text" value="6900"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Alcance</label><input id="m-alcance" type="text" value="210000"></div>
+          <div class="form-group"><label>Alcance Ant.</label><input id="m-alcance-p" type="text" value="195000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Impressões</label><input id="m-impr" type="text" value="580000"></div>
+          <div class="form-group"><label>Impressões Ant.</label><input id="m-impr-p" type="text" value="510000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Cliques</label><input id="m-clicks" type="text" value="9200"></div>
+          <div class="form-group"><label>Cliques Ant.</label><input id="m-clicks-p" type="text" value="8400"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Resultados</label><input id="m-conv" type="text" value="340"></div>
+          <div class="form-group"><label>Resultados Ant.</label><input id="m-conv-p" type="text" value="290"></div>
+        </div>
+        <hr class="form-divider">
+        <div class="form-subtitle">Feed vs Stories</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Invest. Feed (R$)</label><input id="m-feed-inv" type="text" value="4200"></div>
+          <div class="form-group"><label>Invest. Stories (R$)</label><input id="m-stories-inv" type="text" value="3200"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Alcance Feed</label><input id="m-feed-alc" type="text" value="130000"></div>
+          <div class="form-group"><label>Alcance Stories</label><input id="m-stories-alc" type="text" value="80000"></div>
+        </div>
+      </div>
+
+      <div id="s-instagram" class="edit-section">
+        <div class="section-title">Instagram Orgânico</div>
+        <div class="section-sub">Desempenho + histórico de seguidores.</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Seguidores (atual)</label><input id="ig-seg" type="text" value="12400"></div>
+          <div class="form-group"><label>Seguidores Ant.</label><input id="ig-seg-p" type="text" value="11800"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Alcance</label><input id="ig-alcance" type="text" value="48000"></div>
+          <div class="form-group"><label>Alcance Ant.</label><input id="ig-alcance-p" type="text" value="41000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Impressões</label><input id="ig-impr" type="text" value="92000"></div>
+          <div class="form-group"><label>Impressões Ant.</label><input id="ig-impr-p" type="text" value="81000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Engajamento</label><input id="ig-eng" type="text" value="3200"></div>
+          <div class="form-group"><label>Engajamento Ant.</label><input id="ig-eng-p" type="text" value="2750"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Taxa Engajamento (%)</label><input id="ig-taxa" type="text" value="4.2"></div>
+          <div class="form-group"><label>Taxa Ant. (%)</label><input id="ig-taxa-p" type="text" value="3.8"></div>
+        </div>
+        <hr class="form-divider">
+        <div class="form-subtitle">Feed vs Stories</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Alcance Feed</label><input id="ig-feed-alc" type="text" value="32000"></div>
+          <div class="form-group"><label>Alcance Stories</label><input id="ig-stories-alc" type="text" value="16000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Posts publicados</label><input id="ig-posts" type="text" value="18"></div>
+          <div class="form-group"><label>Stories publicados</label><input id="ig-stories-n" type="text" value="42"></div>
+        </div>
+        <hr class="form-divider">
+        <div class="form-subtitle">📈 Histórico de Seguidores</div>
+        <div id="follower-history-rows"></div>
+        <button class="btn-add" onclick="addFollowerMonth()" style="margin-top:8px;">+ Adicionar mês</button>
+      </div>
+
+      <div id="s-facebook" class="edit-section">
+        <div class="section-title">Facebook Orgânico</div>
+        <div class="section-sub">Desempenho orgânico da página.</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Seguidores</label><input id="fb-seg" type="text" value="8900"></div>
+          <div class="form-group"><label>Seguidores Ant.</label><input id="fb-seg-p" type="text" value="8700"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Alcance Orgânico</label><input id="fb-alcance" type="text" value="22000"></div>
+          <div class="form-group"><label>Alcance Ant.</label><input id="fb-alcance-p" type="text" value="19500"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Impressões</label><input id="fb-impr" type="text" value="41000"></div>
+          <div class="form-group"><label>Impressões Ant.</label><input id="fb-impr-p" type="text" value="36000"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Engajamento</label><input id="fb-eng" type="text" value="1100"></div>
+          <div class="form-group"><label>Engajamento Ant.</label><input id="fb-eng-p" type="text" value="940"></div>
+          <div class="form-group"></div>
+          <div class="form-group"><label>Posts publicados</label><input id="fb-posts" type="text" value="14"></div>
+          <div class="form-group"><label>Posts Ant.</label><input id="fb-posts-p" type="text" value="14"></div>
+        </div>
+      </div>
+
+      <div id="s-inf" class="edit-section">
+        <div class="section-title">Influenciadores</div>
+        <div class="section-sub">O @ será clicável no relatório.</div>
+        <div id="inf-list"></div>
+        <button class="btn-add" onclick="addInf()">+ Adicionar Influenciador</button>
+      </div>
+
+      <div id="s-resumo" class="edit-section">
+        <div class="section-title">Resumo Executivo</div>
+        <div class="section-sub">Texto de destaque no final do relatório.</div>
+        <div class="form-group">
+          <label>Texto</label>
+          <textarea id="f-resumo" rows="6">Em [MÊS], a marca alcançou [X] pessoas com as ações digitais combinadas. Os anúncios pagos no Google e Meta geraram [Y] cliques qualificados, enquanto o crescimento orgânico no Instagram somou [Z] novos seguidores. As ações com influenciadores ampliaram a visibilidade com autenticidade e alta taxa de engajamento.</textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ REPORT SCREEN ══ -->
+<div id="report-screen" class="screen">
+  <div class="report-toolbar">
+    <span>Modo Visualização — Relatório do Cliente</span>
+    <div class="toolbar-btns">
+      <button class="btn-back" onclick="backToEdit()">← Editar Dados</button>
+      <button class="btn-pdf" onclick="window.print()">⬇ Exportar PDF</button>
+    </div>
+  </div>
+  <div class="report-page">
+    <div class="r-header">
+      <div class="r-header-left">
+        <div class="r-agency" id="r-agencia">EVOLUTTO</div>
+        <div class="r-agency-tag" id="r-tag">Estratégia & Performance Digital</div>
+      </div>
+      <div class="r-header-right">
+        <div id="r-client-logo-wrap"></div>
+        <div class="r-period" id="r-periodo" style="margin-top:5px;">Março 2025</div>
+      </div>
+    </div>
+    <div class="r-section">
+      <div class="r-section-label">Mídia Paga</div>
+      <div class="r-section-heading">Visão Geral dos Anúncios</div>
+      <div class="cards-grid cards-4" id="r-paga-cards"></div>
+    </div>
+    <div class="r-section">
+      <div class="r-section-label">Detalhamento por Canal</div>
+      <div class="r-section-heading">Google Display & Meta Ads</div>
+      <div id="r-canais"></div>
+    </div>
+    <div class="r-section">
+      <div class="r-section-label">Social Media Orgânico</div>
+      <div class="r-section-heading">Instagram & Facebook</div>
+      <div id="r-organico"></div>
+    </div>
+    <div class="r-section">
+      <div class="r-section-label">Influência Digital</div>
+      <div class="r-section-heading">Ações com Influenciadores</div>
+      <div class="inf-table-wrap">
+        <table class="inf-table">
+          <thead><tr><th>Influenciador</th><th>Plataforma</th><th>Seguidores</th><th>Alcance</th><th>Engajamento</th><th>Taxa</th></tr></thead>
+          <tbody id="r-inf-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="r-section">
+      <div class="r-section-label">Destaque do Mês</div>
+      <div class="r-section-heading">Resumo Executivo</div>
+      <div class="exec-box">
+        <div class="exec-quote">"</div>
+        <p id="r-resumo"></p>
+      </div>
+    </div>
+    <div class="r-footer">
+      <div class="r-footer-brand" id="r-footer-brand">EVOLUTTO</div>
+      <div class="r-footer-note" id="r-footer-note">Relatório Mensal</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+let clientLogoDataUrl='', followerCount=0, infCount=0, followerChart=null;
+let sheetData={};
+
+// ── GOOGLE SHEETS INTEGRATION ──
+async function loadFromSheets(){
+  const id=document.getElementById('sheets-id').value.trim();
+  if(!id){showError('Cole o ID da planilha antes de continuar.');return;}
+  const btn=document.querySelector('.btn-load');
+  btn.disabled=true; btn.textContent='Carregando...';
+  document.getElementById('setup-loading').style.display='block';
+  document.getElementById('setup-error').style.display='none';
+
+  // Usa o endpoint JSON do Google Sheets — lida corretamente com
+  // vírgulas, &, acentos e qualquer caractere especial nos valores
+  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+  try{
+    const resp=await fetch(url);
+    if(!resp.ok) throw new Error('Planilha não encontrada ou não pública.');
+    const text=await resp.text();
+    parseSheetJSON(text);
+    populateForm();
+    document.getElementById('sheets-badge').style.display='inline-block';
+    document.getElementById('sheets-info').style.display='block';
+    showScreen('edit-screen');
+  }catch(e){
+    showError('Não foi possível carregar a planilha. Verifique se o ID está correto e se a planilha está pública (compartilhada como "qualquer pessoa com o link pode ver").');
+  }
+  btn.disabled=false; btn.textContent='☁ Carregar Dados da Planilha';
+  document.getElementById('setup-loading').style.display='none';
+}
+
+function parseSheetJSON(raw){
+  sheetData={};
+  const jsonStr=raw.replace(/^[^{]*/, '').replace(/\);?\s*$/, '');
+  try{
+    const json=JSON.parse(jsonStr);
+    const table=json.table;
+    const cols=table.cols||[];
+    const rows=table.rows||[];
+    const numHeaders=table.parsedNumHeaders||0;
+
+    // Quando o Google "engole" linhas como cabeçalho (parsedNumHeaders>0),
+    // os valores ficam nos labels das colunas: ex col[0].label="CHAVE CONFIG_CLIENTE"
+    // col[1].label="VALOR Café Evolutto" — extraímos tudo depois do primeiro token
+    if(numHeaders>0 && cols.length>=2){
+      const labelA=cols[0].label||'';
+      const labelB=cols[1].label||'';
+      const kMatch=labelA.match(/^\S+\s+([\s\S]+)$/);
+      const vMatch=labelB.match(/^\S+\s+([\s\S]+)$/);
+      if(kMatch && vMatch) sheetData[kMatch[1].trim()]=vMatch[1].trim();
+    }
+
+    // Linhas normais: usa "f" (formatted) quando disponível para pegar texto legível
+    // de datas e outros tipos especiais que chegam como número em "v"
+    rows.forEach(row=>{
+      if(!row.c||row.c.length<2) return;
+      const keyCell=row.c[0];
+      const valCell=row.c[1];
+      if(!keyCell||keyCell.v==null) return;
+      const key=String(keyCell.v).trim();
+      if(!key) return;
+      let val='';
+      if(valCell!=null){
+        // Preferimos "f" (formatted) — traz datas como "março 2026" em vez de 46082
+        // e textos normais como estão
+        if(valCell.f!=null && String(valCell.f).trim()!==''){
+          val=String(valCell.f).trim();
+        } else if(valCell.v!=null){
+          val=String(valCell.v).trim();
+        }
+      }
+      sheetData[key]=val;
+    });
+
+  }catch(e){
+    console.warn('Erro ao parsear JSON do Sheets:', e);
+  }
+}
+
+function g(key,fallback=''){return sheetData[key]!==undefined?sheetData[key]:fallback;}
+
+function populateForm(){
+  const set=(id,key,fb)=>{const el=document.getElementById(id);if(el&&g(key,fb)!==undefined)el.value=g(key,fb);};
+  set('f-cliente','CONFIG_CLIENTE','Café Evolutto');
+  set('f-periodo','CONFIG_PERIODO','Março 2025');
+  set('f-agencia','CONFIG_AGENCIA','EVOLUTTO');
+  set('f-tag','CONFIG_TAG','Estratégia & Performance Digital');
+  set('f-resumo','CONFIG_RESUMO');
+  set('g-invest','G_INVEST','5200'); set('g-invest-p','G_INVEST_P','4800');
+  set('g-impr','G_IMPR','320000'); set('g-impr-p','G_IMPR_P','290000');
+  set('g-clicks','G_CLICKS','4800'); set('g-clicks-p','G_CLICKS_P','4200');
+  set('g-alcance','G_ALCANCE','180000'); set('g-alcance-p','G_ALCANCE_P','160000');
+  set('m-invest','M_INVEST','7400'); set('m-invest-p','M_INVEST_P','6900');
+  set('m-alcance','M_ALCANCE','210000'); set('m-alcance-p','M_ALCANCE_P','195000');
+  set('m-impr','M_IMPR','580000'); set('m-impr-p','M_IMPR_P','510000');
+  set('m-clicks','M_CLICKS','9200'); set('m-clicks-p','M_CLICKS_P','8400');
+  set('m-conv','M_CONV','340'); set('m-conv-p','M_CONV_P','290');
+  set('m-feed-inv','M_FEED_INV','4200'); set('m-stories-inv','M_STORIES_INV','3200');
+  set('m-feed-alc','M_FEED_ALC','130000'); set('m-stories-alc','M_STORIES_ALC','80000');
+  set('ig-seg','IG_SEG','12400'); set('ig-seg-p','IG_SEG_P','11800');
+  set('ig-alcance','IG_ALCANCE','48000'); set('ig-alcance-p','IG_ALCANCE_P','41000');
+  set('ig-impr','IG_IMPR','92000'); set('ig-impr-p','IG_IMPR_P','81000');
+  set('ig-eng','IG_ENG','3200'); set('ig-eng-p','IG_ENG_P','2750');
+  set('ig-taxa','IG_TAXA','4.2'); set('ig-taxa-p','IG_TAXA_P','3.8');
+  set('ig-feed-alc','IG_FEED_ALC','32000'); set('ig-stories-alc','IG_STORIES_ALC','16000');
+  set('ig-posts','IG_POSTS','18'); set('ig-stories-n','IG_STORIES_N','42');
+  set('fb-seg','FB_SEG','8900'); set('fb-seg-p','FB_SEG_P','8700');
+  set('fb-alcance','FB_ALCANCE','22000'); set('fb-alcance-p','FB_ALCANCE_P','19500');
+  set('fb-impr','FB_IMPR','41000'); set('fb-impr-p','FB_IMPR_P','36000');
+  set('fb-eng','FB_ENG','1100'); set('fb-eng-p','FB_ENG_P','940');
+  set('fb-posts','FB_POSTS','14'); set('fb-posts-p','FB_POSTS_P','14');
+
+  // Histórico de seguidores
+  document.getElementById('follower-history-rows').innerHTML='';
+  followerCount=0;
+  for(let i=1;i<=12;i++){
+    const m=g(`HIST_MES_${i}`,''); const val=g(`HIST_VAL_${i}`,'');
+    if(m&&val) addFollowerMonth({month:m,val:val});
+  }
+  if(followerCount===0){
+    [{month:'Out 2024',val:10200},{month:'Nov 2024',val:10800},{month:'Dez 2024',val:11100},
+     {month:'Jan 2025',val:11400},{month:'Fev 2025',val:11800},{month:'Mar 2025',val:12400}]
+    .forEach(d=>addFollowerMonth(d));
+  }
+
+  // Influenciadores
+  document.getElementById('inf-list').innerHTML=''; infCount=0;
+  for(let i=1;i<=5;i++){
+    const nome=g(`INF${i}_NOME`,'');
+    if(nome){
+      addInf({nome,plat:g(`INF${i}_PLAT`,'Instagram'),seg:g(`INF${i}_SEG`,''),
+              alc:g(`INF${i}_ALC`,''),eng:g(`INF${i}_ENG`,''),taxa:g(`INF${i}_TAXA`,'')});
+    }
+  }
+  if(infCount===0){
+    addInf({nome:'@influenciador1',plat:'Instagram',seg:'82000',alc:'45000',eng:'2900',taxa:'6.4'});
+    addInf({nome:'@influenciador2',plat:'Instagram',seg:'34000',alc:'18000',eng:'1100',taxa:'6.1'});
+  }
+}
+
+function showError(msg){
+  const el=document.getElementById('setup-error');
+  el.textContent=msg; el.style.display='block';
+}
+function skipToManual(){
+  document.getElementById('follower-history-rows').innerHTML=''; followerCount=0;
+  [{month:'Out 2024',val:10200},{month:'Nov 2024',val:10800},{month:'Dez 2024',val:11100},
+   {month:'Jan 2025',val:11400},{month:'Fev 2025',val:11800},{month:'Mar 2025',val:12400}]
+  .forEach(d=>addFollowerMonth(d));
+  document.getElementById('inf-list').innerHTML=''; infCount=0;
+  addInf({nome:'@influenciador1',plat:'Instagram',seg:'82000',alc:'45000',eng:'2900',taxa:'6.4'});
+  addInf({nome:'@influenciador2',plat:'Instagram',seg:'34000',alc:'18000',eng:'1100',taxa:'6.1'});
+  showScreen('edit-screen');
+}
+function goToSetup(){showScreen('setup-screen');}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── FORM HELPERS ──
+function showSec(id,el){
+  document.querySelectorAll('.edit-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.edit-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); el.classList.add('active');
+}
+function handleLogoUpload(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    clientLogoDataUrl=e.target.result;
+    document.getElementById('client-logo-preview').src=e.target.result;
+    document.getElementById('client-logo-preview').style.display='block';
+    document.getElementById('client-logo-placeholder').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function addFollowerMonth(data){
+  followerCount++; const id=followerCount; const d=data||{};
+  const div=document.createElement('div');
+  div.className='month-row'; div.id='frow-'+id;
+  div.innerHTML=`
+    <input type="text" class="frow-month" placeholder="Ex: Out 2024" value="${d.month||''}"
+      style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;color:var(--dark);outline:none;">
+    <input type="number" class="frow-val" placeholder="Seguidores" value="${d.val||''}"
+      style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;color:var(--dark);outline:none;">
+    <button onclick="document.getElementById('frow-${id}').remove()"
+      style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;">×</button>`;
+  document.getElementById('follower-history-rows').appendChild(div);
+}
+function addInf(data){
+  infCount++; const id=infCount; const d=data||{};
+  const div=document.createElement('div');
+  div.className='inf-block'; div.id='inf-'+id;
+  div.innerHTML=`
+    <button class="rm" onclick="document.getElementById('inf-${id}').remove()">×</button>
+    <div class="form-grid form-grid-3">
+      <div class="form-group"><label>Handle (@)</label><input class="inf-nome" type="text" value="${d.nome||'@influenciador'}"></div>
+      <div class="form-group"><label>Plataforma</label>
+        <select class="inf-plat">
+          <option ${d.plat=='Instagram'?'selected':''}>Instagram</option>
+          <option ${d.plat=='Facebook'?'selected':''}>Facebook</option>
+          <option ${d.plat=='TikTok'?'selected':''}>TikTok</option>
+          <option ${d.plat=='YouTube'?'selected':''}>YouTube</option>
+        </select></div>
+      <div class="form-group"><label>Seguidores</label><input class="inf-seg" type="text" value="${d.seg||''}"></div>
+      <div class="form-group"><label>Alcance</label><input class="inf-alc" type="text" value="${d.alc||''}"></div>
+      <div class="form-group"><label>Engajamento</label><input class="inf-eng" type="text" value="${d.eng||''}"></div>
+      <div class="form-group"><label>Taxa (%)</label><input class="inf-taxa" type="text" value="${d.taxa||''}"></div>
+    </div>`;
+  document.getElementById('inf-list').appendChild(div);
+}
+
+// ── REPORT GENERATION ──
+function v(id){return(document.getElementById(id)||{value:''}).value;}
+function num(s){return parseFloat((s||'').replace(/\./g,'').replace(',','.'))||0;}
+function fmt(n){return n.toLocaleString('pt-BR');}
+function delta(curr,prev){
+  const c=num(curr),p=num(prev);
+  if(!p) return{pct:'—',cls:'neutral',arrow:'→'};
+  const pct=((c-p)/p*100);
+  return{pct:(pct>0?'+':'')+pct.toFixed(1)+'%',cls:pct>0?'up':'down',arrow:pct>0?'↑':'↓'};
+}
+function card(icon,label,val,prev,explain,topCls){
+  const d=delta(val,prev);
+  const displayVal=isNaN(Number(val))||val.includes('R$')?val:fmt(num(val));
+  return`<div class="r-card">
+    <div class="r-card-top ${topCls||''}"></div>
+    <span class="r-card-icon">${icon}</span>
+    <div class="r-card-label">${label}</div>
+    <div class="r-card-value">${displayVal}</div>
+    <span class="r-delta ${d.cls}">${d.arrow} ${d.pct}</span>
+    <div class="r-card-explain">${explain}</div>
+  </div>`;
+}
+function chRow(label,val,prev){
+  const d=delta(val,prev);
+  const dv=isNaN(Number(val))||val.includes('R$')?val:fmt(num(val));
+  return`<div class="ch-row">
+    <span class="ch-label">${label}</span>
+    <div class="ch-right">
+      <span class="ch-val">${dv}</span>
+      <span class="r-delta ${d.cls}" style="font-size:9px;padding:2px 7px;">${d.arrow} ${d.pct}</span>
+    </div>
+  </div>`;
+}
+function channelCard(dot,title,rows){
+  return`<div class="channel-card">
+    <div class="channel-title-row"><span class="ch-dot ${dot}"></span><span class="channel-title">${title}</span></div>
+    ${rows.map(r=>chRow(r.label,r.val,r.prev)).join('')}
+  </div>`;
+}
+function platformUrl(nome,plat){
+  const h=nome.startsWith('@')?nome.slice(1):nome;
+  const u={Instagram:`https://instagram.com/${h}`,Facebook:`https://facebook.com/${h}`,TikTok:`https://tiktok.com/@${h}`,YouTube:`https://youtube.com/@${h}`};
+  return u[plat]||`https://instagram.com/${h}`;
+}
+
+function generateReport(){
+  document.getElementById('r-agencia').textContent=v('f-agencia');
+  document.getElementById('r-tag').textContent=v('f-tag');
+  document.getElementById('r-periodo').textContent=v('f-periodo');
+  document.getElementById('r-footer-brand').textContent=v('f-agencia');
+  document.getElementById('r-footer-note').textContent='Relatório Mensal — '+v('f-periodo');
+
+  const logoWrap=document.getElementById('r-client-logo-wrap');
+  logoWrap.innerHTML=clientLogoDataUrl
+    ?`<img src="${clientLogoDataUrl}" class="r-client-logo">`
+    :`<div class="r-client-name-text">${v('f-cliente')}</div>`;
+
+  const gi=num(v('g-invest')),mi=num(v('m-invest'));
+  const gip=num(v('g-invest-p')),mip=num(v('m-invest-p'));
+  const ga=num(v('g-alcance')),ma=num(v('m-alcance'));
+  const gap=num(v('g-alcance-p')),map=num(v('m-alcance-p'));
+  const gc=num(v('g-clicks')),mc=num(v('m-clicks'));
+  const gcp=num(v('g-clicks-p')),mcp=num(v('m-clicks-p'));
+
+  document.getElementById('r-paga-cards').innerHTML=
+    card('💰','Investimento Total','R$ '+fmt(gi+mi),'R$ '+fmt(gip+mip),'Total investido em anúncios no período.','')+
+    card('👁️','Pessoas Alcançadas',fmt(ga+ma),fmt(gap+map),'Pessoas únicas que viram os anúncios.','terra')+
+    card('🖱️','Cliques nos Anúncios',fmt(gc+mc),fmt(gcp+mcp),'Total de cliques gerados pelos anúncios.','beige')+
+    card('🎯','Resultados (Meta)',v('m-conv'),v('m-conv-p'),'Conversões geradas pelos anúncios Meta.','');
+
+  document.getElementById('r-canais').innerHTML=
+    channelCard('ch-google','Google Display',[
+      {label:'Investimento',val:'R$ '+fmt(num(v('g-invest'))),prev:'R$ '+fmt(num(v('g-invest-p')))},
+      {label:'Impressões',val:v('g-impr'),prev:v('g-impr-p')},
+      {label:'Cliques',val:v('g-clicks'),prev:v('g-clicks-p')},
+      {label:'Alcance',val:v('g-alcance'),prev:v('g-alcance-p')}
+    ])+
+    channelCard('ch-meta','Meta Ads (Feed + Stories)',[
+      {label:'Investimento',val:'R$ '+fmt(num(v('m-invest'))),prev:'R$ '+fmt(num(v('m-invest-p')))},
+      {label:'Alcance',val:v('m-alcance'),prev:v('m-alcance-p')},
+      {label:'Impressões',val:v('m-impr'),prev:v('m-impr-p')},
+      {label:'Cliques',val:v('m-clicks'),prev:v('m-clicks-p')},
+      {label:'Resultados',val:v('m-conv'),prev:v('m-conv-p')}
+    ])+
+    `<div class="channel-card">
+      <div class="channel-title-row"><span class="ch-dot ch-meta"></span><span class="channel-title">Meta Ads — Feed vs Stories</span></div>
+      <div class="format-split">
+        <div class="format-pill"><div class="fp-label">📸 Feed</div><div class="fp-val">R$ ${fmt(num(v('m-feed-inv')))}</div><div class="fp-sub">Alcance: ${fmt(num(v('m-feed-alc')))}</div></div>
+        <div class="format-pill"><div class="fp-label">📱 Stories</div><div class="fp-val">R$ ${fmt(num(v('m-stories-inv')))}</div><div class="fp-sub">Alcance: ${fmt(num(v('m-stories-alc')))}</div></div>
+      </div>
+    </div>`;
+
+  const frows=document.querySelectorAll('#follower-history-rows .month-row');
+  const fLabels=[],fData=[];
+  frows.forEach(r=>{
+    const m=r.querySelector('.frow-month').value;
+    const val=parseInt(r.querySelector('.frow-val').value)||0;
+    if(m&&val){fLabels.push(m);fData.push(val);}
+  });
+
+  document.getElementById('r-organico').innerHTML=
+    channelCard('ch-ig','Instagram Orgânico',[
+      {label:'Seguidores',val:v('ig-seg'),prev:v('ig-seg-p')},
+      {label:'Alcance',val:v('ig-alcance'),prev:v('ig-alcance-p')},
+      {label:'Impressões',val:v('ig-impr'),prev:v('ig-impr-p')},
+      {label:'Engajamento',val:v('ig-eng'),prev:v('ig-eng-p')},
+      {label:'Taxa de Engajamento',val:v('ig-taxa')+'%',prev:v('ig-taxa-p')+'%'}
+    ])+
+    `<div class="channel-card">
+      <div class="channel-title-row"><span class="ch-dot ch-ig"></span><span class="channel-title">Instagram — Feed vs Stories</span></div>
+      <div class="format-split">
+        <div class="format-pill"><div class="fp-label">📸 Feed</div><div class="fp-val">${fmt(num(v('ig-feed-alc')))}</div><div class="fp-sub">${v('ig-posts')} posts publicados</div></div>
+        <div class="format-pill"><div class="fp-label">📱 Stories</div><div class="fp-val">${fmt(num(v('ig-stories-alc')))}</div><div class="fp-sub">${v('ig-stories-n')} stories publicados</div></div>
+      </div>
+    </div>`+
+    (fLabels.length>1?`<div class="follower-chart-wrap">
+      <div class="follower-chart-title">📈 Crescimento de Seguidores — Histórico</div>
+      <canvas id="followerChart" style="max-height:130px;"></canvas>
+    </div>`:'')+
+    channelCard('ch-fb','Facebook Orgânico',[
+      {label:'Seguidores',val:v('fb-seg'),prev:v('fb-seg-p')},
+      {label:'Alcance Orgânico',val:v('fb-alcance'),prev:v('fb-alcance-p')},
+      {label:'Impressões',val:v('fb-impr'),prev:v('fb-impr-p')},
+      {label:'Engajamento',val:v('fb-eng'),prev:v('fb-eng-p')},
+      {label:'Posts Publicados',val:v('fb-posts'),prev:v('fb-posts-p')}
+    ]);
+
+  if(fLabels.length>1){
+    setTimeout(()=>{
+      const ctx=document.getElementById('followerChart');
+      if(!ctx) return;
+      if(followerChart) followerChart.destroy();
+      followerChart=new Chart(ctx,{
+        type:'line',
+        data:{labels:fLabels,datasets:[{data:fData,borderColor:'#cc2031',backgroundColor:'rgba(204,32,49,.07)',borderWidth:2.5,pointBackgroundColor:'#cc2031',pointRadius:4,tension:0.4,fill:true}]},
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{
+          y:{grid:{color:'rgba(164,109,87,.1)'},ticks:{font:{family:'Montserrat',size:10},color:'#9a7a70',callback:n=>n>=1000?(n/1000).toFixed(0)+'K':n}},
+          x:{grid:{display:false},ticks:{font:{family:'Montserrat',size:10},color:'#9a7a70'}}
+        }}
+      });
+    },100);
+  }
+
+  const infBlocks=document.querySelectorAll('#inf-list .inf-block');
+  let rows='';
+  infBlocks.forEach(b=>{
+    const nome=b.querySelector('.inf-nome').value;
+    const plat=b.querySelector('.inf-plat').value;
+    const seg=b.querySelector('.inf-seg').value;
+    const alc=b.querySelector('.inf-alc').value;
+    const eng=b.querySelector('.inf-eng').value;
+    const taxa=b.querySelector('.inf-taxa').value;
+    if(!nome) return;
+    const url=platformUrl(nome,plat);
+    rows+=`<tr>
+      <td><div class="inf-name"><a href="${url}" target="_blank" class="inf-handle-link">${nome}</a></div></td>
+      <td><span class="inf-plat-tag">${plat}</span></td>
+      <td>${fmt(num(seg))}</td><td>${fmt(num(alc))}</td><td>${fmt(num(eng))}</td>
+      <td><strong>${taxa}%</strong></td>
+    </tr>`;
+  });
+  document.getElementById('r-inf-body').innerHTML=rows||'<tr><td colspan="6" style="color:var(--muted);padding:16px;text-align:center;font-size:11px;">Nenhum influenciador adicionado.</td></tr>';
+  document.getElementById('r-resumo').innerHTML=v('f-resumo').replace(/\[([^\]]+)\]/g,'<strong>[$1]</strong>');
+  showScreen('report-screen');
+}
+function backToEdit(){showScreen('edit-screen');}
+</script>
+</body>
+</html>
