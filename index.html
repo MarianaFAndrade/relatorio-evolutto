@@ -497,20 +497,48 @@ async function loadFromSheets(){
 
 function parseSheetJSON(raw){
   sheetData={};
-  // Google retorna JSONP: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
-  // Precisamos extrair só o JSON interno
   const jsonStr=raw.replace(/^[^{]*/, '').replace(/\);?\s*$/, '');
   try{
     const json=JSON.parse(jsonStr);
-    const rows=json.table.rows;
+    const table=json.table;
+    const cols=table.cols||[];
+    const rows=table.rows||[];
+    const numHeaders=table.parsedNumHeaders||0;
+
+    // Quando o Google "engole" linhas como cabeçalho (parsedNumHeaders>0),
+    // os valores ficam nos labels das colunas: ex col[0].label="CHAVE CONFIG_CLIENTE"
+    // col[1].label="VALOR Café Evolutto" — extraímos tudo depois do primeiro token
+    if(numHeaders>0 && cols.length>=2){
+      const labelA=cols[0].label||'';
+      const labelB=cols[1].label||'';
+      const kMatch=labelA.match(/^\S+\s+([\s\S]+)$/);
+      const vMatch=labelB.match(/^\S+\s+([\s\S]+)$/);
+      if(kMatch && vMatch) sheetData[kMatch[1].trim()]=vMatch[1].trim();
+    }
+
+    // Linhas normais: usa "f" (formatted) quando disponível para pegar texto legível
+    // de datas e outros tipos especiais que chegam como número em "v"
     rows.forEach(row=>{
-      if(!row.c || row.c.length<2) return;
-      const key  = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : '';
-      const val  = row.c[1] && row.c[1].v != null ? String(row.c[1].v).trim() : '';
-      if(key) sheetData[key]=val;
+      if(!row.c||row.c.length<2) return;
+      const keyCell=row.c[0];
+      const valCell=row.c[1];
+      if(!keyCell||keyCell.v==null) return;
+      const key=String(keyCell.v).trim();
+      if(!key) return;
+      let val='';
+      if(valCell!=null){
+        // Preferimos "f" (formatted) — traz datas como "março 2026" em vez de 46082
+        // e textos normais como estão
+        if(valCell.f!=null && String(valCell.f).trim()!==''){
+          val=String(valCell.f).trim();
+        } else if(valCell.v!=null){
+          val=String(valCell.v).trim();
+        }
+      }
+      sheetData[key]=val;
     });
+
   }catch(e){
-    // fallback: tenta parsear mesmo assim
     console.warn('Erro ao parsear JSON do Sheets:', e);
   }
 }
